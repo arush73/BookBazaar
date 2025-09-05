@@ -11,4 +11,24 @@ const addBookSchema = z.object({
   stock: z.preprocess((val) => Number(val), z.number().int().nonnegative()),
 })
 
-export { addBookSchema }
+const addReviewSchema = z.object({
+  rating: z.preprocess(
+    (val) => (val !== undefined ? Number(val) : undefined),
+    z
+      .number({
+        required_error: "Rating is required",
+        invalid_type_error: "Rating must be a number",
+      })
+      .min(1, "Rating must be at least 1")
+      .max(5, "Rating cannot be more than 5")
+  ),
+
+  comment: z
+    .string({
+      required_error: "Comment is required",
+    })
+    .min(1, "Comment cannot be empty")
+    .max(500, "Comment is too long"),
+})
+
+export { addBookSchema, addReviewSchema }

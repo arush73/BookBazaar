@@ -1,8 +1,3 @@
-import fs from "fs"
-import mongoose from "mongoose"
-import logger from "../logger/winston.logger.js"
-
-
 export const getPaginatedPayload = (dataArray, page, limit) => {
   const startPosition = +(page - 1) * limit
 

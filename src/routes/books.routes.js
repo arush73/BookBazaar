@@ -1,8 +1,10 @@
 import { Router } from "express"
-import { verifyJWT, verifyRole } from "../middlewares/auth.middleware.js"
+import {  verifyJWT, verifyRole } from "../middlewares/auth.middleware.js"
 import { UserRolesEnum } from "../constants.js"
 import { upload } from "../middlewares/multer.middleware.js"
+
 const router = Router()
+router.use(verifyJWT)
 
 // POST /books → Add a book (Admin only)
 // GET /books → List all books (public, supports filters)
@@ -21,11 +23,12 @@ import {
   deleteReview,
 } from "../controllers/books.controllers.js"
 
+
 router
   .route("/books")
-  .get(verifyJWT, getAllBooks)
+  .get( getAllBooks)
   .post(
-    verifyJWT,
+    
     verifyRole([UserRolesEnum.ADMIN]),
     upload.fields([
       { name: "mainImage", maxCount: 1 },
@@ -35,9 +38,9 @@ router
   )
 router
   .route("/books/:id")
-  .get(verifyJWT, getBookDetails)
-  .put(verifyJWT, verifyRole([UserRolesEnum.ADMIN]), updateBook)
-  .delete(verifyJWT, verifyRole([UserRolesEnum.ADMIN]), deleteBook)
+  .get( getBookDetails)
+  .put( verifyRole([UserRolesEnum.ADMIN]), updateBook)
+  .delete( verifyRole([UserRolesEnum.ADMIN]), deleteBook)
 
 // reviewRoutes
 // POST /books/:bookId/reviews → Add review to a book
@@ -46,8 +49,8 @@ router
 
 router
   .route("/books/:BookId/reviews")
-  .post(verifyJWT, addReview)
+  .post( addReview)
   .get(getReviews)
-router.route("/reviews/:id").delete(verifyJWT, deleteReview)
+router.route("/reviews/:id").delete( deleteReview)
 
 export default router

@@ -1,4 +1,4 @@
-export const DB_NAME = ""
+export const DB_NAME = "bookbazaar"
 
 export const UserRolesEnum = {
   ADMIN: "ADMIN",

@@ -91,10 +91,10 @@ const loginUser = asyncHandler(async (req, res) => {
   const { email, username, password } = req.body
 
   const user = await User.findOne({
-    $or: [{ username }, { email }],
+    $and: [{ username }, { email }],
   })
 
-  if (!user) throw new ApiError(404, "User does not exist")
+  if (!user) throw new ApiError(404, "User with provided email and username does not exist")
 
   if (user.loginType !== UserLoginType.EMAIL_PASSWORD) {
     throw new ApiError(

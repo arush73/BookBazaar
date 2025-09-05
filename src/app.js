@@ -6,7 +6,7 @@ import { rateLimit } from "express-rate-limit"
 import cors from "cors"
 import morganMiddleware from "./logger/morgan.logger.js"
 import session from "express-session"
-import passport from "passport"
+import passport from "./passport/index.js"
 
 const app = express()
 console.log(process.env.EXPRESS_SESSION_SECRET)

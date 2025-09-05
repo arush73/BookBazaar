@@ -28,18 +28,13 @@ const bookSchema = new mongoose.Schema(
       min: 0,
       default: 0,
     },
-    category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-      required: true,
-    },
+    // category: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "Category",
+    //   required: true,
+    // },
     subImages: {
-      type: [
-        {
-          url: String,
-          localPath: String,
-        },
-      ],
+      type: [String],
       default: [],
     },
     mainImage: {

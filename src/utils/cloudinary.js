@@ -19,11 +19,12 @@ const uploadCloudinary = async (localFilePath) => {
       resource_type: "auto",
     })
 
+    fs.unlinkSync(localFilePath)
+
     return upload 
 
-    fs.unlinkSync(localFilePath)
   } catch (err) {
-    logger.error(err.message)
+    logger.error(err)
     fs.unlinkSync(localFilePath)
     return null
   }

@@ -11,16 +11,21 @@ const storage = multer.diskStorage({
         file.originalname.lastIndexOf(".")
       )
     }
+
+    // clean filename (sirf a-z, 0-9, dash rakhega)
     const filenameWithoutExtension = file.originalname
       .toLowerCase()
-      .split(" ")
-      .join("-")
-      ?.split(".")[0]
+      .replace(/\s+/g, "-") // space → dash
+      .replace(/[^a-z0-9-]/g, "") // sab hatado jo safe nahi hai
+      .split(".")[0]
+
     cb(
       null,
       filenameWithoutExtension +
+        "-" +
         Date.now() +
-        Math.ceil(Math.random() * 1e5) + 
+        "-" +
+        Math.ceil(Math.random() * 1e5) +
         fileExtension
     )
   },
@@ -29,6 +34,6 @@ const storage = multer.diskStorage({
 export const upload = multer({
   storage,
   limits: {
-    fileSize: 1 * 1000 * 1000,
+    fileSize: 1 * 1000 * 1000, // 1MB
   },
-});
+})

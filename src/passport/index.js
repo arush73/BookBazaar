@@ -146,3 +146,5 @@ try {
 } catch (error) {
   console.error("PASSPORT ERROR: ", error)
 }
+
+export default passport

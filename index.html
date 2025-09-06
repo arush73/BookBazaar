@@ -2,15 +2,15 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     var options = {
-        "key": "rzp_test_RE9z4rpzdThF70", // apna test key id
-        "amount": "10000", // paisa me
+        "key": "your_test_key", 
+        "amount": "10000", // in paisa 
         "currency": "INR",
         "name": "Test Store",
         "description": "Test Transaction",
-        "order_id": "order_REI8z04eCt5DUs", // jo backend/dashboard se mila
+        "order_id": "your_order_id", 
         "handler": function (response) {
             console.log(response);
-            // yaha se milega:
+            // you will get
             // response.razorpay_order_id
             // response.razorpay_payment_id
             // response.razorpay_signature

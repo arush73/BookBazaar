@@ -80,7 +80,8 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        "User registered successfully and verification email has been sent on your email"
+        "User registered successfully and verification email has been sent on your email",
+        createdUser
       )
     )
 })

@@ -3,18 +3,18 @@ import { verifyJWT } from "../middlewares/auth.middleware.js"
 
 const router = Router()
 
-router.use(verifyJWT)
+// router.use(verifyJWT)
 
-import { generateRazorpayOrder } from "../controllers/orders.controllers.js"
+import { generateRazorpayOrder, verifyRazorpayPayment} from "../controllers/orders.controllers.js"
 
 router.route("/provider/razorpay").post(generateRazorpayOrder)
 // router
 //   .route("/provider/paypal")
 //   .post(mongoIdRequestBodyValidator("addressId"),  generatePaypalOrder)
 
-// router
-//   .route("/provider/razorpay/verify-payment")
-//   .post(verifyRazorpayPaymentValidator(),  verifyRazorpayPayment)
+router
+  .route("/provider/razorpay/verify-payment")
+  .post(  verifyRazorpayPayment)
 
 // router
 //   .route("/provider/paypal/verify-payment")

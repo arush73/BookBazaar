@@ -8,9 +8,11 @@ import Order from "../models/orders.models.js"
 import crypto from "crypto"
 import { verifyRazorpayPaymentSchema } from "../validators/order.validators.js"
 import { sendMail, orderConfirmationMailgenContent } from "../utils/mail.js"
-import { OrderStatusEnum } from "../constants.js"
+import { OrderStatusEnum, PaymentProviderEnum } from "../constants.js"
+import { getCart } from "./cart.controllers.js"
+import { nanoid } from "nanoid"
 
-// could add paypal api later 
+// could add paypal api later
 
 let razorpayInstance
 
@@ -104,9 +106,14 @@ const generateRazorpayOrder = asyncHandler(async (req, res) => {
   const orderItems = cart.items
   const userCart = await getCart(req.user._id)
 
+  console.log("this is the cart coming: ", cart)
+
   // would be same as no coupons used
   const totalPrice = userCart.cartTotal
   const totalDiscountedPrice = userCart.discountedTotal
+
+  console.log("this is the total price: ", totalPrice)
+  console.log("This is the totalDiscountedPrice: ", totalDiscountedPrice)
 
   const orderOptions = {
     amount: parseInt(totalDiscountedPrice) * 100, // in paisa
@@ -117,7 +124,10 @@ const generateRazorpayOrder = asyncHandler(async (req, res) => {
   razorpayInstance.orders.create(
     orderOptions,
     async function (err, razorpayOrder) {
+      console.log("func enter")
+      console.log("ye ha bhenchod error: ", err)
       if (!razorpayOrder || (err && err.error)) {
+        console.log("func if enter")
         // Throwing ApiError here will not trigger the error handler middleware
         return res
           .status(err.statusCode)
@@ -128,12 +138,18 @@ const generateRazorpayOrder = asyncHandler(async (req, res) => {
               err.error.reason ||
                 "Something went wrong while initialising the razorpay order."
             )
-          )
+        )
       }
+      console.log("without entering the if condn")
 
       const { addressLine1, addressLine2, city, country, pincode, state } =
         address
 
+      // Create an order while we generate razorpay session
+      // In case payment is done and there is some network issue in the payment verification api
+      // We will at least have a record of the order
+
+      console.log("creating the order")
       const unpaidOrder = await Order.create({
         address: {
           addressLine1,
@@ -151,18 +167,21 @@ const generateRazorpayOrder = asyncHandler(async (req, res) => {
         paymentId: razorpayOrder.id,
         coupon: userCart.coupon?._id,
       })
+
+      console.log("order created successfully")
       if (unpaidOrder) {
+        // if order is created then only proceed with the payment
         return res
           .status(200)
-          .json(new ApiResponse(200, "Razorpay order generated", razorpayOrder))
+          .json(new ApiResponse(200, razorpayOrder, "Razorpay order generated"))
       } else {
         return res
           .status(500)
           .json(
             new ApiResponse(
               500,
-              "Something went wrong while initialising the razorpay order.",
-              null
+              null,
+              "Something went wrong while initialising the razorpay order."
             )
           )
       }
@@ -425,4 +444,4 @@ export {
   getOrderById,
   getOrderListAdmin,
   updateOrderStatus,
-};
+}

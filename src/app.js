@@ -65,7 +65,7 @@ import cartRouter from "./routes/cart.routes.js"
 // decalring routes
 app.use("/api/v1/healthcheck", healthcheckRouter)
 app.use("/api/v1/auth", authRouter)
-app.use("/api/v1/", bookRouter)
+app.use("/api/v1", bookRouter)
 app.use("/api/v1/orders", orderRouter)
 app.use("/api/v1/address", addressRouter)
 app.use("/api/v1/cart", cartRouter)

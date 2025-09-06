@@ -45,7 +45,6 @@ const addBook = asyncHandler(async (req, res) => {
   req.files?.subImages.map((element) => {
     subImagesPath.push(element.path)
   })
-  console.log("Main Image Path: ", mainImagePath)
   const uploadMainImage = await uploadCloudinary(mainImagePath)
   if(!uploadMainImage) throw new ApiError(400,"failed to upload the mainImage to cloudinary")
   let subImagesURL = []
@@ -54,9 +53,6 @@ const addBook = asyncHandler(async (req, res) => {
     if(!temp) throw new ApiError("failed to upload subImages to cloudinary")
     subImagesURL.push(temp.url)
   }
-
-  // console.log("uplaodMainImage: ", uploadMainImage)
-  // console.log("subImagesURL: ", subImagesURL)
 
   const book = await Book.create({
     title,
@@ -93,9 +89,11 @@ const getBookDetails = asyncHandler(async (req, res) => {
 })
 
 const updateBook = asyncHandler(async (req, res) => {
+  console.log("reached the update bok controller")
   const { bookId } = req.params
-
+console.log(req.body, "\n\n\n")
   const validate = addBookSchema.safeParse(req.body)
+  console.log(validate)
   if (!validate.success)
     throw new ApiError(
       401,

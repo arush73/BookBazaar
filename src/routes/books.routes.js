@@ -37,10 +37,17 @@ router
     addBook
   )
 router
-  .route("/books/:id")
-  .get( getBookDetails)
-  .put( verifyRole([UserRolesEnum.ADMIN]), updateBook)
-  .delete( verifyRole([UserRolesEnum.ADMIN]), deleteBook)
+  .route("/books/:bookId")
+  .get(getBookDetails)
+  .patch(
+    verifyRole([UserRolesEnum.ADMIN]),
+    upload.fields([
+      { name: "mainImage", maxCount: 1 },
+      { name: "subImages", maxCount: 4 },
+    ]),
+    updateBook
+  )
+  .delete(verifyRole([UserRolesEnum.ADMIN]), deleteBook)
 
 // reviewRoutes
 // POST /books/:bookId/reviews → Add review to a book

@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { ApiError } from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
 import Razorpay from "razorpay";
+import Address from "../models/address.models";
 
 let razorpayInstance
 

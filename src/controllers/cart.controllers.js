@@ -83,7 +83,7 @@ const addItemOrUpdateItemQuantity = asyncHandler(async (req, res) => {
   if (quantity > book.stock) {
     throw new ApiError(
       400,
-      product.stock > 0
+      book.stock > 0
         ? "Only " +
           book.stock +
           " products are remaining. But you are adding " +
@@ -119,8 +119,9 @@ const removeItemFromCart = asyncHandler(async (req, res) => {
 
   const book = await Book.findById(bookId)
 
+  // check for product existence
   if (!book) {
-    throw new ApiError(404, "book does not exist")
+    throw new ApiError(404, "Product does not exist")
   }
 
   const updatedCart = await Cart.findOneAndUpdate(
@@ -130,7 +131,7 @@ const removeItemFromCart = asyncHandler(async (req, res) => {
     {
       $pull: {
         items: {
-          productId: productId,
+          bookId: bookId,
         },
       },
     },
@@ -139,9 +140,18 @@ const removeItemFromCart = asyncHandler(async (req, res) => {
 
   let cart = await getCart(req.user._id)
 
+  // check if the cart's new total is greater than the minimum cart total requirement of the coupon
+  // if (cart.coupon && cart.cartTotal < cart.coupon.minimumCartValue) {
+  //   // if it is less than minimum cart value remove the coupon code which is applied
+  //   updatedCart.coupon = null
+  //   await updatedCart.save({ validateBeforeSave: false })
+  //   // fetch the latest updated cart
+  //   cart = await getCart(req.user._id)
+  // }
+
   return res
     .status(200)
-    .json(new ApiResponse(200, "Cart item removed successfully", cart))
+    .json(new ApiResponse(200,  "Cart item removed successfully", cart))
 })
 
 const clearCart = asyncHandler(async (req, res) => {

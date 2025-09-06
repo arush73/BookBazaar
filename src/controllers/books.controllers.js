@@ -13,7 +13,7 @@ const getAllBooks = asyncHandler(async (req, res) => {
   const bookAggregate = Book.aggregate([{ $match: {} }])
 
   const books = await Book.aggregatePaginate(
-    productAggregate,
+    bookAggregate,
     getMongoosePaginationOptions({
       page,
       limit,
@@ -47,9 +47,11 @@ const addBook = asyncHandler(async (req, res) => {
   })
   console.log("Main Image Path: ", mainImagePath)
   const uploadMainImage = await uploadCloudinary(mainImagePath)
+  if(!uploadMainImage) throw new ApiError(400,"failed to upload the mainImage to cloudinary")
   let subImagesURL = []
   for (const element of subImagesPath) {
     const temp = await uploadCloudinary(element)
+    if(!temp) throw new ApiError("failed to upload subImages to cloudinary")
     subImagesURL.push(temp.url)
   }
 

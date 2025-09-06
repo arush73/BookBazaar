@@ -1,8 +1,8 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/ApiError.js"
-import { ApiResponse } from "../utils/ApiError.js"
+import { ApiResponse } from "../utils/ApiResponse.js"
 import Address from "../models/address.models.js"
-import { createAddressSchema } from "../validators/addres.validators.js"
+import { createAddressSchema } from "../validators/address.validators.js"
 import { getMongoosePaginationOptions } from "../utils/helpers.js"
 
 const createAddress = asyncHandler(async (req, res) => {
@@ -55,8 +55,7 @@ const getAllAddresses = asyncHandler(async (req, res) => {
   return (
     res
       .status(200)
-      .json(new ApiResponse(200, "Addresses fetched successfully")),
-    addresses
+      .json(new ApiResponse(200, "Addresses fetched successfully", addresses))
   )
 })
 

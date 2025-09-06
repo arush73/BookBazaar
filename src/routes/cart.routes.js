@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { verifyJWT } from "../../../middlewares/auth.middlewares.js"
+import { verifyJWT } from "../middlewares/auth.middleware.js"
 
 const router = Router()
 router.use(verifyJWT)
@@ -9,14 +9,14 @@ import {
   clearCart,
   getUserCart,
   removeItemFromCart,
-} from "../../../controllers/apps/ecommerce/cart.controllers.js"
+} from "../controllers/cart.controllers.js"
 
 router.route("/").get(getUserCart)
 
 router.route("/clear").delete(clearCart)
 
 router
-  .route("/item/:productId")
+  .route("/item/:bookId")
   .post(addItemOrUpdateItemQuantity)
   .delete(removeItemFromCart)
 

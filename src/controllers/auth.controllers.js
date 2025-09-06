@@ -9,10 +9,15 @@ import {
   resetForgottenPasswordSchema,
 } from "../validators/auth.validators.js"
 import { UserRolesEnum, UserLoginType } from "../constants.js"
-import { emailVerificationMailgenContent, forgotPasswordMailgenContent, sendMail } from "../utils/mail.js"
+import {
+  emailVerificationMailgenContent,
+  forgotPasswordMailgenContent,
+  sendMail,
+} from "../utils/mail.js"
 import crypto from "crypto"
 import { uploadCloudinary } from "../utils/cloudinary.js"
 import jwt from "jsonwebtoken"
+import Cart from "../models/cart.models.js"
 
 const cookieOptions = () => {
   return {
@@ -94,7 +99,11 @@ const loginUser = asyncHandler(async (req, res) => {
     $and: [{ username }, { email }],
   })
 
-  if (!user) throw new ApiError(404, "User with provided email and username does not exist")
+  if (!user)
+    throw new ApiError(
+      404,
+      "User with provided email and username does not exist"
+    )
 
   if (user.loginType !== UserLoginType.EMAIL_PASSWORD) {
     throw new ApiError(
@@ -120,7 +129,17 @@ const loginUser = asyncHandler(async (req, res) => {
 
   loggedInUser.refreshToken = refreshToken
   await loggedInUser.save({ validateBeforeSave: false })
-  
+
+  if (user.isEmailVerified === true) {
+    const cart = await Cart.findOne({ owner: user._id })
+
+    if (!cart) {
+      await Cart.create({
+        owner: user._id,
+      })
+    }
+  }
+
   return res
     .status(200)
     .cookie("accessToken", accessToken, cookieOptions())
@@ -244,16 +263,18 @@ const forgotPasswordRequest = asyncHandler(async (req, res) => {
   user.forgotPasswordExpiry = tokenExpiry
   await user.save({ validateBeforeSave: false })
 
-  console.log(await sendMail({
-    email: user?.email,
-    subject: "Password reset request",
-    mailgenContent: forgotPasswordMailgenContent(
-      user.username,
-      // ! NOTE: Following link should be the link of the frontend page responsible to request password reset
-      // ! Frontend will send the below token with the new password in the request body to the backend reset password endpoint
-      `${process.env.FORGOT_PASSWORD_REDIRECT_URL}/${unHashedToken}`
-    ),
-  }))
+  console.log(
+    await sendMail({
+      email: user?.email,
+      subject: "Password reset request",
+      mailgenContent: forgotPasswordMailgenContent(
+        user.username,
+        // ! NOTE: Following link should be the link of the frontend page responsible to request password reset
+        // ! Frontend will send the below token with the new password in the request body to the backend reset password endpoint
+        `${process.env.FORGOT_PASSWORD_REDIRECT_URL}/${unHashedToken}`
+      ),
+    })
+  )
   return res
     .status(200)
     .json(

@@ -419,9 +419,9 @@ const getOrderListAdmin = asyncHandler(async (req, res) => {
 
 export {
   generateRazorpayOrder,
-  generatePaypalOrder,
+  // generatePaypalOrder,
   verifyRazorpayPayment,
-  verifyPaypalPayment,
+  // verifyPaypalPayment,
   getOrderById,
   getOrderListAdmin,
   updateOrderStatus,

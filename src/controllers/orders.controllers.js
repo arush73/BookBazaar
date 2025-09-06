@@ -5,6 +5,7 @@ import Razorpay from "razorpay"
 import Address from "../models/address.models.js"
 import Cart from "../models/cart.models.js"
 import Order from "../models/orders.models.js"
+import Book from "../models/books.models.js"
 import crypto from "crypto"
 import { verifyRazorpayPaymentSchema } from "../validators/order.validators.js"
 import { sendMail, orderConfirmationMailgenContent } from "../utils/mail.js"
@@ -51,7 +52,7 @@ const orderFulfillmentHelper = async (orderPaymentId, req) => {
   let bulkStockUpdates = userCart.items.map((item) => {
     return {
       updateOne: {
-        filter: { _id: item.product?._id },
+        filter: { _id: item.book?._id },
         update: { $inc: { stock: -item.quantity } }, // subtract the item quantity
       },
     }
@@ -130,7 +131,7 @@ const generateRazorpayOrder = asyncHandler(async (req, res) => {
         console.log("func if enter")
         // Throwing ApiError here will not trigger the error handler middleware
         return res
-          .status(err.statusCode)
+          .status(500)
           .json(
             new ApiResponse(
               err.statusCode,
@@ -190,7 +191,7 @@ const generateRazorpayOrder = asyncHandler(async (req, res) => {
 })
 
 const verifyRazorpayPayment = asyncHandler(async (req, res) => {
-  const validate = verifyRazorpayPaymentSchema.safeParse()
+  const validate = verifyRazorpayPaymentSchema.safeParse(req.body)
   if (!validate.success) {
     throw new ApiError(
       400,

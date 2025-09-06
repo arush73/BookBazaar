@@ -1,8 +1,9 @@
-import { asyncHandler } from "../utils/asyncHandler";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import Razorpay from "razorpay";
-import Address from "../models/address.models";
+import { asyncHandler } from "../utils/asyncHandler.js"
+import { ApiError } from "../utils/ApiError.js"
+import { ApiResponse } from "../utils/ApiResponse.js"
+import Razorpay from "razorpay"
+import Address from "../models/address.models.js"
+import Cart from "../models/cart.models.js"
 
 let razorpayInstance
 
@@ -23,7 +24,8 @@ const generateRazorpayOrder = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Internal server error")
   }
 
-  // Check if address is valid and is of logged in user's
+  console.log("ye ha razorpay instance: ", razorpayInstance)
+
   const address = await Address.findOne({
     _id: addressId,
     owner: req.user._id,
@@ -112,4 +114,10 @@ const generateRazorpayOrder = asyncHandler(async (req, res) => {
       }
     }
   )
+
+  return res.status(200).json(new ApiResponse(200, "order created successfully", {}))
 })
+
+export {
+  generateRazorpayOrder
+}

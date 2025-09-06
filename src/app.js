@@ -59,11 +59,15 @@ import healthcheckRouter from "./routes/healthCheck.routes.js"
 import authRouter from "./routes/auth.routes.js"
 import bookRouter from "./routes/books.routes.js"
 import orderRouter from "./routes/orders.routes.js"
+import addressRouter from "./routes/address.routes.js"
+import cartRouter from "./routes/cart.routes.js"
 
 // decalring routes
 app.use("/api/v1/healthcheck", healthcheckRouter)
 app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/", bookRouter)
 app.use("/api/v1/orders", orderRouter)
+app.use("/api/v1/address", addressRouter)
+app.use("/api/v1/cart", cartRouter)
 
 export default app

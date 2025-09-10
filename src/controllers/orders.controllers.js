@@ -53,7 +53,7 @@ const orderFulfillmentHelper = async (orderPaymentId, req) => {
     return {
       updateOne: {
         filter: { _id: item.book?._id },
-        update: { $inc: { stock: -item.quantity } }, // subtract the item quantity
+        update: { $inc: { stock: -item.quantity } }, y
       },
     }
   })
@@ -107,14 +107,8 @@ const generateRazorpayOrder = asyncHandler(async (req, res) => {
   const orderItems = cart.items
   const userCart = await getCart(req.user._id)
 
-  console.log("this is the cart coming: ", cart)
-
-  // would be same as no coupons used
   const totalPrice = userCart.cartTotal
   const totalDiscountedPrice = userCart.discountedTotal
-
-  console.log("this is the total price: ", totalPrice)
-  console.log("This is the totalDiscountedPrice: ", totalDiscountedPrice)
 
   const orderOptions = {
     amount: parseInt(totalDiscountedPrice) * 100, // in paisa
@@ -125,11 +119,8 @@ const generateRazorpayOrder = asyncHandler(async (req, res) => {
   razorpayInstance.orders.create(
     orderOptions,
     async function (err, razorpayOrder) {
-      console.log("func enter")
-      console.log("ye ha bhenchod error: ", err)
       if (!razorpayOrder || (err && err.error)) {
         console.log("func if enter")
-        // Throwing ApiError here will not trigger the error handler middleware
         return res
           .status(500)
           .json(
@@ -141,16 +132,10 @@ const generateRazorpayOrder = asyncHandler(async (req, res) => {
             )
         )
       }
-      console.log("without entering the if condn")
 
       const { addressLine1, addressLine2, city, country, pincode, state } =
         address
 
-      // Create an order while we generate razorpay session
-      // In case payment is done and there is some network issue in the payment verification api
-      // We will at least have a record of the order
-
-      console.log("creating the order")
       const unpaidOrder = await Order.create({
         address: {
           addressLine1,
@@ -169,9 +154,7 @@ const generateRazorpayOrder = asyncHandler(async (req, res) => {
         coupon: userCart.coupon?._id,
       })
 
-      console.log("order created successfully")
       if (unpaidOrder) {
-        // if order is created then only proceed with the payment
         return res
           .status(200)
           .json(new ApiResponse(200, razorpayOrder, "Razorpay order generated"))
@@ -212,7 +195,7 @@ const verifyRazorpayPayment = asyncHandler(async (req, res) => {
     const order = await orderFulfillmentHelper(razorpay_order_id, req)
     return res
       .status(201)
-      .json(new ApiResponse(201, order, "Order placed successfully"))
+      .json(new ApiResponse(201,  "Order placed successfully",order))
   } else {
     throw new ApiError(400, "Invalid razorpay signature")
   }
@@ -258,7 +241,6 @@ const getOrderById = asyncHandler(async (req, res) => {
         _id: new mongoose.Types.ObjectId(orderId),
       },
     },
-    // lookup for a customer associated with the order
     {
       $lookup: {
         from: "users",
@@ -276,59 +258,25 @@ const getOrderById = asyncHandler(async (req, res) => {
         ],
       },
     },
-    // lookup for a coupon applied while placing the order
-    // {
-    //   $lookup: {
-    //     from: "coupons",
-    //     foreignField: "_id",
-    //     localField: "coupon",
-    //     as: "coupon",
-    //     pipeline: [
-    //       {
-    //         $project: {
-    //           name: 1,
-    //           couponCode: 1,
-    //         },
-    //       },
-    //     ],
-    //   },
-    // },
-    // lookup returns array so get the first element of address and customer
     {
       $addFields: {
         customer: { $first: "$customer" },
-        // coupon: { $ifNull: [{ $first: "$coupon" }, null] },
       },
     },
-    // Now we have array of order items with productId being the id of the product that is being ordered
-    // So we want to send complete details of that product
-
-    // To do so we first unwind the items array
     { $unwind: "$items" },
-
-    // it gives us documents with `items` being an object with ket {_id, productId, quantity}
     {
-      // lookup for a product associated
       $lookup: {
         from: "books",
         localField: "items.bookId",
         foreignField: "_id",
-        as: "items.book", // store that looked up product in items.product key
+        as: "items.book", 
       },
     },
-    // As we know lookup will return an array
-    // we want product key to be an object not array
-    // So, once lookup is done we access first item in an array
     { $addFields: { "items.book": { $first: "$items.book" } } },
-    // As we have unwind the items array the output of the following stages is not desired one
-    // So to make it desired we need to group whatever we have unwinded
     {
       $group: {
-        // we group the documents with `_id (which is an order id)`
-        // The reason being, each order is unique and main entity of this api
         _id: "$_id",
-        order: { $first: "$$ROOT" }, // we also assign whole root object to be the order
-        // we create a new key orderItems in which we will push each order item (product details and quantity) with complete product details
+        order: { $first: "$$ROOT" }, 
         orderItems: {
           $push: {
             _id: "$items._id",
@@ -340,13 +288,11 @@ const getOrderById = asyncHandler(async (req, res) => {
     },
     {
       $addFields: {
-        // now we will create a new items key in the order object and assign the orderItems value to it to keep everything in the `order` key
         "order.items": "$orderItems",
       },
     },
     {
       $project: {
-        // ignore the orderItems key as we don't need it
         orderItems: 0,
       },
     },
@@ -372,7 +318,6 @@ const getOrderListAdmin = asyncHandler(async (req, res) => {
             }
           : {},
     },
-    // lookup for a customer associated with the order
     {
       $lookup: {
         from: "users",
@@ -390,22 +335,6 @@ const getOrderListAdmin = asyncHandler(async (req, res) => {
         ],
       },
     },
-    // {
-    //   $lookup: {
-    //     from: "coupons",
-    //     foreignField: "_id",
-    //     localField: "coupon",
-    //     as: "coupon",
-    //     pipeline: [
-    //       {
-    //         $project: {
-    //           name: 1,
-    //           couponCode: 1,
-    //         },
-    //       },
-    //     ],
-    //   },
-    // },
     {
       $addFields: {
         customer: { $first: "$customer" },
@@ -439,9 +368,7 @@ const getOrderListAdmin = asyncHandler(async (req, res) => {
 
 export {
   generateRazorpayOrder,
-  // generatePaypalOrder,
   verifyRazorpayPayment,
-  // verifyPaypalPayment,
   getOrderById,
   getOrderListAdmin,
   updateOrderStatus,

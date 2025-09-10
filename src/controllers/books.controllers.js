@@ -89,11 +89,9 @@ const getBookDetails = asyncHandler(async (req, res) => {
 })
 
 const updateBook = asyncHandler(async (req, res) => {
-  console.log("reached the update bok controller")
   const { bookId } = req.params
-console.log(req.body, "\n\n\n")
+
   const validate = addBookSchema.safeParse(req.body)
-  console.log(validate)
   if (!validate.success)
     throw new ApiError(
       401,

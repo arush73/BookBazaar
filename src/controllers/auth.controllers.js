@@ -8,7 +8,7 @@ import {
   forgotPasswordSchema,
   resetForgottenPasswordSchema,
 } from "../validators/auth.validators.js"
-import { UserRolesEnum, UserLoginType } from "../constants.js"
+import { UserLoginType } from "../constants.js"
 import {
   emailVerificationMailgenContent,
   forgotPasswordMailgenContent,
@@ -65,7 +65,7 @@ const registerUser = asyncHandler(async (req, res) => {
       user.username,
       `${req.protocol}://${req.get(
         "host"
-      )}/api/v1/users/verify-email/${unHashedToken}`
+      )}/api/v1/auth/verify-email/${unHashedToken}`
     ),
   })
 
@@ -79,7 +79,7 @@ const registerUser = asyncHandler(async (req, res) => {
     .status(201)
     .json(
       new ApiResponse(
-        200,
+        201,
         "User registered successfully and verification email has been sent on your email",
         createdUser
       )
@@ -169,7 +169,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     .status(200)
     .clearCookie("accessToken", cookieOptions())
     .clearCookie("refreshToken", cookieOptions())
-    .json(new ApiResponse(200, {}, "User logged out"))
+    .json(new ApiResponse(200, "User logged out", {}))
 })
 
 const verifyEmail = asyncHandler(async (req, res) => {
@@ -202,10 +202,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
 })
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
-  console.log("req.cookies.refreshToken: ", req.cookies.refreshToken)
-  console.log("req.body.refreshToken: ", req.body?.refreshToken)
   const incomingRefreshToken = req.cookies.refreshToken
-  console.log("incoming refreh token: ", incomingRefreshToken)
 
   if (!incomingRefreshToken) throw new ApiError(401, "Unauthorized request")
 
@@ -232,11 +229,10 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       .cookie("accessToken", accessToken, cookieOptions())
       .cookie("refreshToken", newRefreshToken, cookieOptions())
       .json(
-        new ApiResponse(
-          200,
-          { accessToken, refreshToken: newRefreshToken },
-          "Access token refreshed"
-        )
+        new ApiResponse(200, "Access token refreshed", {
+          accessToken,
+          refreshToken: newRefreshToken,
+        })
       )
   } catch (error) {
     throw new ApiError(401, error?.message || "Invalid refresh token")
@@ -270,8 +266,6 @@ const forgotPasswordRequest = asyncHandler(async (req, res) => {
       subject: "Password reset request",
       mailgenContent: forgotPasswordMailgenContent(
         user.username,
-        // ! NOTE: Following link should be the link of the frontend page responsible to request password reset
-        // ! Frontend will send the below token with the new password in the request body to the backend reset password endpoint
         `${process.env.FORGOT_PASSWORD_REDIRECT_URL}/${unHashedToken}`
       ),
     })
@@ -281,8 +275,8 @@ const forgotPasswordRequest = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        {},
-        "Password reset mail has been sent on your mail id"
+        "Password reset mail has been sent on your mail id",
+        {}
       )
     )
 })
@@ -314,7 +308,7 @@ const resetForgottenPassword = asyncHandler(async (req, res) => {
   await user.save({ validateBeforeSave: false })
   return res
     .status(200)
-    .json(new ApiResponse(200, {}, "Password reset successfully"))
+    .json(new ApiResponse(200, "Password reset successfully", {}))
 })
 
 const changeCurrentPassword = asyncHandler(async (req, res) => {
@@ -340,13 +334,13 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, {}, "Password changed successfully"))
+    .json(new ApiResponse(200, "Password changed successfully", {}))
 })
 
 const getCurrentUser = asyncHandler(async (req, res) => {
   return res
     .status(200)
-    .json(new ApiResponse(200, req.user, "Current user fetched successfully"))
+    .json(new ApiResponse(200, "Current user fetched successfully", req.user))
 })
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
@@ -375,7 +369,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, updatedUser, "Avatar updated successfully"))
+    .json(new ApiResponse(200, "Avatar updated successfully", updatedUser))
 })
 
 const handleSocialLogin = asyncHandler(async (req, res) => {
@@ -393,10 +387,10 @@ const handleSocialLogin = asyncHandler(async (req, res) => {
       .status(301)
       .cookie("accessToken", accessToken, cookieOptions)
       .cookie("refreshToken", refreshToken, cookieOptions)
-      // .redirect(
-      //   // redirect user to the frontend with access and refresh token in case user is not using cookies
-      //   `${process.env.CLIENT_SSO_REDIRECT_URL}?accessToken=${accessToken}&refreshToken=${refreshToken}`
-      // )
+      .redirect(
+        // redirect user to the frontend with access and refresh token in case user is not using cookies
+        `${process.env.CLIENT_SSO_REDIRECT_URL}?accessToken=${accessToken}&refreshToken=${refreshToken}`
+      )
       .json(new ApiResponse(200, "user created sucessfully via google", user))
   )
 })

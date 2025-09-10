@@ -6,12 +6,6 @@ import { upload } from "../middlewares/multer.middleware.js"
 const router = Router()
 router.use(verifyJWT)
 
-// POST /books → Add a book (Admin only)
-// GET /books → List all books (public, supports filters)
-// GET /books/:id → Get book details
-// PUT /books/:id → Update book (Admin only)
-// DELETE /books/:id → Delete book (Admin only)
-
 import {
   getAllBooks,
   addBook,
@@ -22,7 +16,6 @@ import {
   getReviews,
   deleteReview,
 } from "../controllers/books.controllers.js"
-
 
 router
   .route("/books")
@@ -48,11 +41,6 @@ router
     updateBook
   )
   .delete(verifyRole([UserRolesEnum.ADMIN]), deleteBook)
-
-// reviewRoutes
-// POST /books/:bookId/reviews → Add review to a book
-// GET /books/:bookId/reviews → List reviews for a book
-// DELETE / reviews /: id → Delete review(owner only)
 
 router
   .route("/books/:BookId/reviews")

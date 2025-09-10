@@ -19,8 +19,8 @@ app.use(
   cors({
     origin:
       process.env.CORS_ORIGIN === "*"
-        ? "*" // This might give CORS error for some origins due to credentials set to true
-        : process.env.CORS_ORIGIN?.split(","), // For multiple cors origin for production. Refer https://github.com/hiteshchoudhary/apihub/blob/a846abd7a0795054f48c7eb3e71f3af36478fa96/.env.sample#L12C1-L12C12
+        ? "*" 
+        : process.env.CORS_ORIGIN?.split(","), 
     credentials: true,
   })
 )
@@ -54,7 +54,6 @@ app.use(
 app.use(passport.initialize())
 app.use(passport.session())
 
-// importing routes
 import healthcheckRouter from "./routes/healthCheck.routes.js"
 import authRouter from "./routes/auth.routes.js"
 import bookRouter from "./routes/books.routes.js"
@@ -62,7 +61,6 @@ import orderRouter from "./routes/orders.routes.js"
 import addressRouter from "./routes/address.routes.js"
 import cartRouter from "./routes/cart.routes.js"
 
-// decalring routes
 app.use("/api/v1/healthcheck", healthcheckRouter)
 app.use("/api/v1/auth", authRouter)
 app.use("/api/v1", bookRouter)

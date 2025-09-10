@@ -36,7 +36,7 @@ export const getCart = async (userId) => {
         },
         cartTotal: {
           $sum: {
-            $multiply: ["$book.price", "$quantity"], // 👈 book.price se total nikalega
+            $multiply: ["$book.price", "$quantity"],
           },
         },
       },
@@ -119,7 +119,7 @@ const removeItemFromCart = asyncHandler(async (req, res) => {
 
   const book = await Book.findById(bookId)
 
-  // check for product existence
+  // check for book existence
   if (!book) {
     throw new ApiError(404, "Product does not exist")
   }
@@ -139,15 +139,6 @@ const removeItemFromCart = asyncHandler(async (req, res) => {
   )
 
   let cart = await getCart(req.user._id)
-
-  // check if the cart's new total is greater than the minimum cart total requirement of the coupon
-  // if (cart.coupon && cart.cartTotal < cart.coupon.minimumCartValue) {
-  //   // if it is less than minimum cart value remove the coupon code which is applied
-  //   updatedCart.coupon = null
-  //   await updatedCart.save({ validateBeforeSave: false })
-  //   // fetch the latest updated cart
-  //   cart = await getCart(req.user._id)
-  // }
 
   return res
     .status(200)

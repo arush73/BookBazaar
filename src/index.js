@@ -6,7 +6,7 @@ import logger from "./logger/winston.logger.js"
 import app from "./app.js"
 
 const startServer = () => {
-  app.listen(process.env.PORT || 8080, () => {
+  app.listen(process.env.PORT, () => {
     logger.info(
       `📑 visit the server at: http://localhost:${process.env.PORT || 8080}`
     )

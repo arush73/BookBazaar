@@ -102,39 +102,42 @@ bookbazaar/
     Create a `.env` file in the root directory and populate it based on `.env.sample`.
     ```env
     PORT=8080
-    MONGODB_URI=mongodb://localhost:27017/bookbazaar
+    MONGODB_URI=mongodb://localhost:27017
     NODE_ENV=development
+    EXPRESS_SESSION_SECRET=__express_session_secret__
     
-    # Auth Secrets
-    ACCESS_TOKEN_SECRET=<your_secret>
-    ACCESS_TOKEN_EXPIRY=1d
-    REFRESH_TOKEN_SECRET=<your_secret>
-    REFRESH_TOKEN_EXPIRY=10d
-    EXPRESS_SESSION_SECRET=<your_secret>
+    ACCESS_TOKEN_SECRET=__access_token_secret__
+    ACCESS_TOKEN_EXPIRY=__access_token_expiry__
+    REFRESH_TOKEN_SECRET=__refresh_token_secret__
+    REFRESH_TOKEN_EXPIRY=__refresh_token_expiry__
     
-    # Cloudinary
-    CLOUDINARY_CLOUD_NAME=<your_cloud_name>
-    CLOUDINARY_API_KEY=<your_api_key>
-    CLOUDINARY_API_SECRET=<your_api_secret>
+    CORS_ORIGIN=http://localhost:3000
     
-    # Email (Mailtrap/SMTP)
-    MAILTRAP_SMTP_HOST=sandbox.smtp.mailtrap.io
-    MAILTRAP_SMTP_PORT=2525
-    MAILTRAP_SMTP_USER=<your_user>
-    MAILTRAP_SMTP_PASS=<your_pass>
+    MAILTRAP_SMTP_HOST=__mailtrap_smtp_host__
+    MAILTRAP_SMTP_PORT=__mailtrap_smtp_port__
+    MAILTRAP_SMTP_USER=__mailtrap_smtp_user_id__
+    MAILTRAP_SMTP_PASS=__mailtrap_smtp_user_password__
     
-    # Payments
-    RAZORPAY_KEY_ID=<your_key>
-    RAZORPAY_KEY_SECRET=<your_secret>
+    GMAIL_USER=your_gmail_user_id
+    GMAIL_PASSWORD=your_gmail_app_password
     
-    # OAuth
-    GOOGLE_CLIENT_ID=<your_id>
-    GOOGLE_CLIENT_SECRET=<your_secret>
-    GOOGLE_CALLBACK_URL=http://localhost:8080/api/v1/auth/google/callback
+    RAZORPAY_KEY_ID=__razorpay_key_id__
+    RAZORPAY_KEY_SECRET=__razorpay_key_secret__
     
-    GITHUB_CLIENT_ID=<your_id>
-    GITHUB_CLIENT_SECRET=<your_secret>
-    GITHUB_CALLBACK_URL=http://localhost:8080/api/v1/auth/github/callback
+    PAYPAL_CLIENT_ID=__paypal_client_id__
+    PAYPAL_SECRET=__paypal_secret__
+    
+    GOOGLE_CLIENT_ID=__google_client_id__
+    GOOGLE_CLIENT_SECRET=__google_client_secret__
+    GOOGLE_CALLBACK_URL=http://localhost:8080/api/v1/users/google/callback
+    
+    GITHUB_CLIENT_ID=__github_client_id__
+    GITHUB_CLIENT_SECRET=__github_client_secret__
+    GITHUB_CALLBACK_URL=http://localhost:8080/api/v1/users/github/callback
+    
+    CLIENT_SSO_REDIRECT_URL=http://localhost:3000/user/profile
+    
+    FORGOT_PASSWORD_REDIRECT_URL=http://localhost:3000/forgot-password
     ```
 
 4.  **Start the Server:**

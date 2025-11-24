@@ -89,7 +89,7 @@ bookbazaar/
 
 1.  **Clone the repository:**
     ```bash
-    git clone <repository-url>
+    git clone https://github.com/arush73/bookbazaar.git
     cd bookbazaar
     ```
 
